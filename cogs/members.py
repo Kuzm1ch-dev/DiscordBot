@@ -21,9 +21,14 @@ class MembersCog(commands.Cog):
             return
 
         _db = db.Database(member.guild.id)
-        if _db.add_exp(member.id, 500): # Если уровень повысился, меняем роль
-            role = member.guild.get_role(int(_db.requeried_roleid( _db.get_level(member.id))))
-            await member.edit(roles=[role])
+        if _db.add_exp(member.id, 500): # Если уровень повысился и есть соответсвующая роль, меняем роль
+            required_roleid = _db.check_role(member.id)
+            if required_roleid != None:
+                role = member.guild.get_role(int(required_roleid))
+                _db.set_roleid(member.id, required_roleid)
+                await member.edit(roles=[role])
+                await ctx.send(f'<@{member.id}>, теперь ты {role}!')
+            await ctx.send(f'<@{member.id}>, ты получил новый уровень!')
         _db.close()
         await ctx.send(f'Респект плотный тебе, <@{member.id}>')
             

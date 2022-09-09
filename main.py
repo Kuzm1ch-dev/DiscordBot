@@ -67,14 +67,18 @@ async def load_database():
         _db = db.Database(guild.id)
         _db.check_tables()
 
+        # Проверяем таблицу уровней, все ли роли уровней созданы
         for level in _db.get_level_pattern():
+            print (level)
             if (level[5] == None or level[5] == ""): # Если роль новая, то создать ее на сервере
+                print(f"На сервере {guild.id} найдена новая роль {level[1]}")
                 role = await guild.create_role(name = f"{level[1]}", color=discord.Color.from_rgb(*level[2:5]))
-                print(f"Создана роль {role.name}")
+                print(f"На сервере {guild.id} создана роль {role.name}")
                 _db.update_roleid_on_table(level[0],role.id)
 
+        # Проверка, есть ли новые пользователи
         for member in guild.members:
-            query = _db.check_user(uid= member.id)
+            query = _db.check_newbie_user(uid= member.id)
             if query != None:
                 await member.add_roles(guild.get_role(int(query)))
 
