@@ -14,70 +14,28 @@ class MembersCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='respect', aliases=['res'])
+    @commands.command(name='spy')
     @commands.guild_only()
-    async def respect(self, ctx, *, member: discord.Member=None):
-        if member is None or member == ctx.author:
-            return
-
+    async def spy(self, ctx, *, member: discord.Member):
         _db = db.Database(member.guild.id)
-        if _db.add_exp(member.id, 500): # Если уровень повысился и есть соответсвующая роль, меняем роль
-            required_roleid = _db.check_role(member.id)
-            if required_roleid != None:
-                role = member.guild.get_role(int(required_roleid))
-                _db.set_roleid(member.id, required_roleid)
-                await member.edit(roles=[role])
-                await ctx.send(f'<@{member.id}>, теперь ты {role}!')
-            await ctx.send(f'<@{member.id}>, ты получил новый уровень!')
+        _db.add_user_to_spy_table(member.id)
         _db.close()
-        await ctx.send(f'Респект плотный тебе, <@{member.id}>')
-            
-    @commands.command()
+        await ctx.send(f'{member.display_name} взят под наблюдение')
+
+    @commands.command(name='despy')
     @commands.guild_only()
-    async def joined(self, ctx, *, member: discord.Member):
-        """Says when a member joined."""
-        await ctx.send(f'{member.display_name} joined on {member.joined_at}')
+    async def despy(self, ctx, *, member: discord.Member):
+        _db = db.Database(member.guild.id)
+        _db.remove_user_from_spy(member.id)
+        _db.close()
+        await ctx.send(f'{member.display_name} больше не под наблюдением')
 
-    @commands.command(name='coolbot')
-    async def cool_bot(self, ctx):
-        """Is the bot cool?"""
-        await ctx.send('This bot is cool. :)')
+    @commands.Cog.listener()
+    async def on_presence_update(self, before: discord.Member, after: discord.Member):
+        _db = db.Database(after.guild.id)
+        if _db.check_spy_user(after.id):
+            await self.bot.get_channel(1018780223115907083).send(f"@everyone ALLARM! <@{after.id}> В СЕТИ")
+        _db.close()
 
-    @commands.command(name='top_role', aliases=['toprole'])
-    @commands.guild_only()
-    async def show_toprole(self, ctx, *, member: discord.Member=None):
-        """Simple command which shows the members Top Role."""
-
-        if member is None:
-            member = ctx.author
-
-        await ctx.send(f'The top role for {member.display_name} is {member.top_role.name}')
-    
-    @commands.command(name='perms', aliases=['perms_for', 'permissions'])
-    @commands.guild_only()
-    async def check_permissions(self, ctx, *, member: discord.Member=None):
-        """A simple command which checks a members Guild Permissions.
-        If member is not provided, the author will be checked."""
-
-        if not member:
-            member = ctx.author
-
-        # Here we check if the value of each permission is True.
-        perms = '\n'.join(perm for perm, value in member.guild_permissions if value)
-
-        # And to make it look nice, we wrap it in an Embed.
-        embed = discord.Embed(title=f'Права для ```{member.name}```:', description=ctx.guild.name, colour=member.colour)
-        try:
-            embed.set_author(icon_url=member.avatar_url, name=str(member))
-        except Exception:
-            pass
-        # \uFEFF is a Zero-Width Space, which basically allows us to have an empty field name.
-        embed.add_field(name='\uFEFF', value=perms)
-
-        await ctx.send(content=None, embed=embed)
-        # Thanks to Gio for the Command.
-
-# The setup fucntion below is neccesarry. Remember we give bot.add_cog() the name of the class in this case MembersCog.
-# When we load the cog, we use the name of the file.
 async def setup(bot):
     await bot.add_cog(MembersCog(bot))

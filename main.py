@@ -35,8 +35,7 @@ class ExBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=get_prefix, description='Мяу!', intents=intents, case_insensitive=True)
         self.initial_extensions =[
-            'cogs.members',
-            'cogs.simple'
+            'cogs.members'
         ]
     
     async def setup_hook(self):
@@ -66,22 +65,6 @@ async def load_database():
     for guild in bot.guilds:
         _db = db.Database(guild.id)
         _db.check_tables()
-
-        # Проверяем таблицу уровней, все ли роли уровней созданы
-        for level in _db.get_level_pattern():
-            print (level)
-            if (level[5] == None or level[5] == ""): # Если роль новая, то создать ее на сервере
-                print(f"На сервере {guild.id} найдена новая роль {level[1]}")
-                role = await guild.create_role(name = f"{level[1]}", color=discord.Color.from_rgb(*level[2:5]))
-                print(f"На сервере {guild.id} создана роль {role.name}")
-                _db.update_roleid_on_table(level[0],role.id)
-
-        # Проверка, есть ли новые пользователи
-        for member in guild.members:
-            query = _db.check_newbie_user(uid= member.id)
-            if query != None:
-                await member.add_roles(guild.get_role(int(query)))
-
         _db.close()
     
     _db.close()
@@ -93,7 +76,6 @@ async def on_ready():
     # Меняем статус бота
     await bot.change_presence(activity=discord.Game(name='рабочинские прибаутки', type=1, url='https://vk.com/kuzm14'))
     print(f'Успешно авторизован и запущен...!')
-
 
 
 if __name__ == "__main__":
