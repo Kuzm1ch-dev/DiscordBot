@@ -1,7 +1,3 @@
-from ast import Pass
-from cmath import log
-from dis import dis, disco
-from unittest import async_case
 from discord.ext import commands, tasks
 from discord.ext.commands import CommandNotFound, RoleNotFound, MemberNotFound
 import discord
@@ -9,7 +5,7 @@ import discord
 import asyncio
 import os
 import aiohttp
-from os import listdir
+
 from dotenv import load_dotenv
 from db import db
 
@@ -38,16 +34,18 @@ class ExBot(commands.Bot):
             'cogs.members'
         ]
     
-    async def setup_hook(self):
+    async def setup_hook(self)-> None:
         self.background_task.start()
         self.session = aiohttp.ClientSession()
         for ext in self.initial_extensions:
             await self.load_extension(ext)
+            print(f"Расширение {ext} загружено ")
+
     async def close(self):
         await super().close()
         await self.session.close()
 
-    @tasks.loop(minutes=10)
+    @tasks.loop(seconds=60)
     async def background_task(self):
         print('Запуск фоновых задач...')
     
@@ -80,4 +78,3 @@ async def on_ready():
 
 if __name__ == "__main__":
     bot.run(os.getenv('TOKEN'), reconnect=True)
-

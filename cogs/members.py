@@ -1,5 +1,3 @@
-from dis import dis, disco
-import imp
 import discord
 import sys
 sys.path.append("..")
@@ -16,9 +14,10 @@ class MembersCog(commands.Cog):
 
     @commands.command(name='spy')
     @commands.guild_only()
-    async def spy(self, ctx, *, member: discord.Member):
+    async def spy(self, ctx: commands.Context, *, member: discord.Member):
         _db = db.Database(member.guild.id)
         _db.add_user_to_spy_table(member.id)
+        _db.set_alarm_channel(ctx.message.channel.id)
         _db.close()
         await ctx.send(f'{member.display_name} взят под наблюдение')
 
@@ -34,7 +33,7 @@ class MembersCog(commands.Cog):
     async def on_presence_update(self, before: discord.Member, after: discord.Member):
         _db = db.Database(after.guild.id)
         if _db.check_spy_user(after.id):
-            await self.bot.get_channel(1018780223115907083).send(f"@everyone ALLARM! <@{after.id}> В СЕТИ")
+            await self.bot.get_channel(_db.get_alarm_channel()).send(f"@everyone ALLARM! <@{after.id}> В СЕТИ")
         _db.close()
 
 async def setup(bot):
