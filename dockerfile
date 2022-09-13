@@ -7,7 +7,6 @@ RUN pip install -r requirements.txt
 FROM python:3.10-slim
 WORKDIR /code
 
-COPY —from=builder /root/.local /root/.local
 ADD db/ db/
 ADD cogs/ cogs/
 COPY ./ .
