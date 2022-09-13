@@ -83,7 +83,10 @@ class Database():
         self.con.commit()
 
     def set_alarm_channel(self, cid: string):
-        self.cur.execute(f"INSERT INTO data_table (gid,alarm_channel_id) VALUES ({self.gid},{cid})")
+        try:
+            self.cur.execute(f"INSERT INTO data_table (gid,alarm_channel_id) VALUES ({self.gid},{cid})")
+        except sqlite3.IntegrityError as e:
+            self.change_alarm_channel(cid)
         self.con.commit()
 
     def get_alarm_channel(self):
