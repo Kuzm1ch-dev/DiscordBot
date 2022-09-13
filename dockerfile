@@ -1,16 +1,16 @@
+
 FROM python:3.10 AS builder
 COPY requirements.txt .
-ADD . /cogs
-ADD . /db
 
-RUN pip install --user -r requirements.txt
+RUN pip install —user -r requirements.txt
 
 FROM python:3.10-slim
 WORKDIR /code
 
-COPY --from=builder /root/.local /root/.local
-COPY ./src .
-
+COPY —from=builder /root/.local /root/.local
+ADD db/ db/
+ADD cogs/ cogs/
+COPY ./ .
 ENV PATH=/root/.local:$PATH
 
-CMD ["python", "-u", "main.py"]
+CMD ["python3", "main.py"]
