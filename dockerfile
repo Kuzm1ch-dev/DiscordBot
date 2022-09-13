@@ -1,5 +1,5 @@
 FROM python:3.10 AS builder
-COPY requirements.txt
+COPY requirements.txt .
 
 RUN pip install --user -r requirements.txt
 
