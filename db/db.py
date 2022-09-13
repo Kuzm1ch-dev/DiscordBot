@@ -3,7 +3,6 @@ import os.path
 
 import os
 import string
-from turtle import st
 from dotenv import load_dotenv
 
 load_dotenv()

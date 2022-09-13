@@ -13,4 +13,4 @@ COPY ./src .
 
 ENV PATH=/root/.local:$PATH
 
-CMD ["python", "-u", "./main.py"]
+CMD ["python", "-u", "main.py"]
