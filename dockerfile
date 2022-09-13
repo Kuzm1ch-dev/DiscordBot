@@ -1,7 +1,7 @@
 FROM python:3.10 AS builder
 COPY requirements.txt .
-ADD /cogs
-ADD /db
+ADD . /cogs
+ADD . /db
 
 RUN pip install --user -r requirements.txt
 
