@@ -1,3 +1,4 @@
+from dis import disco
 from imaplib import Commands
 from tkinter.tix import Tree
 import discord
@@ -13,7 +14,7 @@ from db import db
 
 
 class MembersCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
 
@@ -26,8 +27,15 @@ class MembersCog(commands.Cog):
     @app_commands.guild_only()
     async def spy(self, interaction: discord.Interaction, *, member: discord.Member):
         _db = db.Database(member.guild.id)
+        if (_db.check_alarm_channel() == False):
+            await interaction.response.send_message(f'Канал оповещений не назначен, воспользуйтесь коммандой \'/setalarm\'')
+            _db.close()
+            return
+        if (_db.check_spy_user(member.id)):
+            await interaction.response.send_message(f'{member.display_name} уже под наблюдением') 
+            _db.close()
+            return 
         _db.add_user_to_spy_table(member.id)
-        _db.set_alarm_channel(interaction.channel_id)
         _db.close()
         await interaction.response.send_message(f'{member.display_name} взят под наблюдение')
 
@@ -41,17 +49,28 @@ class MembersCog(commands.Cog):
 
     @app_commands.command(name='alarm')
     @app_commands.guild_only()
-    async def despy(self, interaction: discord.Interaction):
-        print(interaction.guild_id)
+    async def getalarm(self, interaction: discord.Interaction):
         _db = db.Database(interaction.guild_id)
-        await interaction.response.send_message(f'Алярм канал: {_db.get_alarm_channel()}')
+        if (_db.check_alarm_channel()):
+            await interaction.response.send_message(f'Канал оповещений: {_db.get_alarm_channel()}')
+        else:
+            await interaction.response.send_message(f'Канал оповещений не назначен, воспользуйтесь коммандой \'/setalarm\'')
         _db.close()
 
-    @commands.Cog.listener()
-    async def on_presence_update(self, before: discord.Member, after: discord.Member):
-        _db = db.Database(after.guild.id)
-        if _db.check_spy_user(after.id):
-            await self.bot.get_channel(_db.get_alarm_channel()).send(f"@everyone ALARM! <@{after.id}> В СЕТИ")
+    @app_commands.command(name='setalarm')
+    @app_commands.guild_only()
+    async def setalarm(self, interaction: discord.Interaction):
+        _db = db.Database(interaction.guild_id)
+        _db.set_alarm_channel(interaction.channel_id)   
+        await interaction.response.send_message(f'Канал {interaction.channel.name} теперь используется для оповеений')
+        _db.close()
+
+    @app_commands.command(name='remalarm')
+    @app_commands.guild_only()
+    async def remalarm(self, interaction: discord.Interaction):
+        _db = db.Database(interaction.guild_id)
+        _db.remove_alarm_channel()   
+        await interaction.response.send_message(f'Канал оповещений удален! Чтобы назначить новый, воспользуйтесь коммандой \'/setalarm\'')
         _db.close()
 
 async def setup(bot):
