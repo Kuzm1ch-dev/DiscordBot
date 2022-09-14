@@ -1,6 +1,3 @@
-from dis import disco
-from imaplib import Commands
-from tkinter.tix import Tree
 import discord
 import sys
 sys.path.append("..")

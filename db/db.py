@@ -1,11 +1,9 @@
-from pickle import TRUE
 import sqlite3
 import os.path
 
 import os
 import string
 from tkinter.tix import Tree
-from xmlrpc.client import Boolean
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -93,12 +91,12 @@ class Database():
     def get_alarm_channel(self):
         return self.cur.execute(f"SELECT * FROM data_table WHERE gid={self.gid}").fetchall()[0][0]
 
-    def remove_alarm_channel(self) -> Boolean:
+    def remove_alarm_channel(self) -> bool:
         self.cur.execute(f"DELETE FROM data_table WHERE gid={self.gid}")
         self.con.commit()
         return True
 
-    def check_alarm_channel(self) -> Boolean:
+    def check_alarm_channel(self) -> bool:
         if(len(self.cur.execute(f"SELECT * FROM data_table WHERE gid={self.gid}").fetchall()) > 0):
             return True
         else:

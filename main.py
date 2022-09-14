@@ -1,4 +1,3 @@
-from email.mime import application
 from discord.ext import commands, tasks
 from discord.ext.commands import CommandNotFound, RoleNotFound, MemberNotFound
 import discord
