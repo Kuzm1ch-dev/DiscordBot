@@ -3,7 +3,6 @@ import os.path
 
 import os
 import string
-from tkinter.tix import Tree
 from dotenv import load_dotenv
 
 load_dotenv()
