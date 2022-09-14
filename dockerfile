@@ -1,17 +1,12 @@
-
 FROM python:3.10 AS builder
-COPY requirements.txt .
-
-RUN pip install -r requirements.txt
 
 FROM python:3.10-slim
-WORKDIR /code
+WORKDIR /app
 
-<<<<<<< HEAD
-COPY --from=builder /root/.local /root/.local
-=======
-COPY —from=builder /root/.local /root/.local
->>>>>>> 83bd1a5d4ed265b1872eb238ddfc4bf61a86af39
+COPY requirements.txt .
+
+RUN pip3 install -r requirements.txt
+
 ADD db/ db/
 ADD cogs/ cogs/
 COPY ./ .
