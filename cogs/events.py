@@ -37,7 +37,14 @@ class EventCog(commands.Cog):
     async def on_presence_update(self, before: discord.Member, after: discord.Member):
         _db = db.Database(after.guild.id)
         if _db.check_spy_user(after.id):
-            await self.bot.get_channel(_db.get_alarm_channel()).send(f"@everyone ВНИМАНИЕ! <@{after.id}> В СЕТИ")
+            id = int(_db.get_alarm_channel())
+            print(id)
+            guild = self.bot.get_guild(after.guild.id)
+            channel = await guild.fetch_channel(id)
+            if(after.status == discord.Status.online):
+                await self.bot.get_guild(after.guild.id).get_channel(int(_db.get_alarm_channel())).send(f"@everyone ВНИМАНИЕ! <@{after.id}> В СЕТИ")
+            elif (after.status == discord.Status.offline):
+                await self.bot.get_guild(after.guild.id).get_channel(int(_db.get_alarm_channel())).send(f"@everyone ВНИМАНИЕ! <@{after.id}> НЕ В СЕТИ")
         _db.close()
     
 async def setup(bot):

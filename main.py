@@ -9,11 +9,12 @@ import aiohttp
 from dotenv import load_dotenv
 from db import db
 
+intents = discord.Intents.all()
+intents.reactions = True
+intents.members = True
+intents.guilds = True
 
 load_dotenv()
-
-
-intents = discord.Intents.all()
 
 def get_prefix(bot, message):
 
@@ -58,4 +59,4 @@ bot = ExBot()
 bot.remove_command("help")
 
 if __name__ == "__main__":
-    bot.run(os.getenv('TOKEN'), reconnect=True)
+    bot.run(os.getenv('TOKEN'), reconnect=True  )

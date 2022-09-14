@@ -88,7 +88,7 @@ class Database():
         self.con.commit()
 
     def get_alarm_channel(self):
-        return self.cur.execute(f"SELECT * FROM data_table WHERE gid={self.gid}").fetchall()[0][0]
+        return self.cur.execute(f"SELECT * FROM data_table WHERE gid={self.gid}").fetchall()[0][1]
 
     def remove_alarm_channel(self) -> bool:
         self.cur.execute(f"DELETE FROM data_table WHERE gid={self.gid}")
