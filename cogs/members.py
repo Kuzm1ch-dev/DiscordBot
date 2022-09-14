@@ -39,11 +39,19 @@ class MembersCog(commands.Cog):
         _db.close()
         await interaction.response.send_message(f'{member.display_name} больше не под наблюдением')
 
+    @app_commands.command(name='alarm')
+    @app_commands.guild_only()
+    async def despy(self, interaction: discord.Interaction):
+        print(interaction.guild_id)
+        _db = db.Database(interaction.guild_id)
+        await interaction.response.send_message(f'Алярм канал: {_db.get_alarm_channel()}')
+        _db.close()
+
     @commands.Cog.listener()
     async def on_presence_update(self, before: discord.Member, after: discord.Member):
         _db = db.Database(after.guild.id)
         if _db.check_spy_user(after.id):
-            await self.bot.get_channel(_db.get_alarm_channel()).send(f"@everyone ALLARM! <@{after.id}> В СЕТИ")
+            await self.bot.get_channel(_db.get_alarm_channel()).send(f"@everyone ALARM! <@{after.id}> В СЕТИ")
         _db.close()
 
 async def setup(bot):
